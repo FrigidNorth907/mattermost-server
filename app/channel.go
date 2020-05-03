@@ -2245,13 +2245,13 @@ func (a *App) MoveChannel(team *model.Team, channel *model.Channel, user *model.
 		return err
 	}
 
-	if err := a.Srv().Store.Channel().UpdateSidebarChannelCategoryOnMove(channel, team.Id); err != nil {
-		return err
+	if appErr := a.Srv().Store.Channel().UpdateSidebarChannelCategoryOnMove(channel, team.Id); appErr != nil {
+		return appErr
 	}
 
 	channel.TeamId = team.Id
-	if _, err = a.Srv().Store.Channel().Update(channel); err != nil {
-		return err
+	if _, appErr := a.Srv().Store.Channel().Update(channel); appErr != nil {
+		return appErr
 	}
 	a.postChannelMoveMessage(user, channel, previousTeam)
 
