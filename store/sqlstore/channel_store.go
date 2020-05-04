@@ -428,7 +428,7 @@ func (s SqlChannelStore) MigrateSidebarCategories(fromTeamId, fromUserId string)
 	var userTeamMap []struct {
 		UserId string
 		TeamId string
-		Locale string
+		Locale *string
 	}
 
 	transaction, err := s.GetMaster().Begin()
@@ -448,7 +448,11 @@ func (s SqlChannelStore) MigrateSidebarCategories(fromTeamId, fromUserId string)
 	}
 
 	for _, u := range userTeamMap {
-		T := utils.GetUserTranslations(u.Locale)
+		locale := "en"
+		if u.Locale != nil {
+			locale = *u.Locale
+		}
+		T := utils.GetUserTranslations(locale)
 		if err := transaction.Insert(&model.SidebarCategory{
 			DisplayName: T("sidebar.category.favorites"),
 			Id:          model.NewId(),
