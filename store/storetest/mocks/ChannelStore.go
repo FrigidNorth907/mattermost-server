@@ -1177,13 +1177,13 @@ func (_m *ChannelStore) GetSidebarCategories(userId string, teamId string) (*mod
 	return r0, r1
 }
 
-// GetSidebarCategory provides a mock function with given fields: userId, teamId, categoryId
-func (_m *ChannelStore) GetSidebarCategory(userId string, teamId string, categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
-	ret := _m.Called(userId, teamId, categoryId)
+// GetSidebarCategory provides a mock function with given fields: categoryId
+func (_m *ChannelStore) GetSidebarCategory(categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
+	ret := _m.Called(categoryId)
 
 	var r0 *model.SidebarCategoryWithChannels
-	if rf, ok := ret.Get(0).(func(string, string, string) *model.SidebarCategoryWithChannels); ok {
-		r0 = rf(userId, teamId, categoryId)
+	if rf, ok := ret.Get(0).(func(string) *model.SidebarCategoryWithChannels); ok {
+		r0 = rf(categoryId)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.SidebarCategoryWithChannels)
@@ -1191,8 +1191,8 @@ func (_m *ChannelStore) GetSidebarCategory(userId string, teamId string, categor
 	}
 
 	var r1 *model.AppError
-	if rf, ok := ret.Get(1).(func(string, string, string) *model.AppError); ok {
-		r1 = rf(userId, teamId, categoryId)
+	if rf, ok := ret.Get(1).(func(string) *model.AppError); ok {
+		r1 = rf(categoryId)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(*model.AppError)

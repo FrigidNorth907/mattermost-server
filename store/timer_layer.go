@@ -1240,10 +1240,10 @@ func (s *TimerLayerChannelStore) GetSidebarCategories(userId string, teamId stri
 	return resultVar0, resultVar1
 }
 
-func (s *TimerLayerChannelStore) GetSidebarCategory(userId string, teamId string, categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
+func (s *TimerLayerChannelStore) GetSidebarCategory(categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
 	start := timemodule.Now()
 
-	resultVar0, resultVar1 := s.ChannelStore.GetSidebarCategory(userId, teamId, categoryId)
+	resultVar0, resultVar1 := s.ChannelStore.GetSidebarCategory(categoryId)
 
 	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
 	if s.Root.Metrics != nil {

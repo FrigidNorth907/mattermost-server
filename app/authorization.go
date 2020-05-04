@@ -84,7 +84,7 @@ func (a *App) SessionHasPermissionToCategory(session model.Session, teamId, cate
 	if a.SessionHasPermissionTo(session, model.PERMISSION_EDIT_OTHER_USERS) {
 		return true
 	}
-	category, err := a.GetSidebarCategory(session.UserId, teamId, categoryId)
+	category, err := a.GetSidebarCategory(categoryId)
 
 	return err == nil && category != nil && category.UserId == session.UserId
 }

@@ -3470,7 +3470,7 @@ func (s SqlChannelStore) CreateSidebarCategory(userId, teamId string, newCategor
 	}, nil
 }
 
-func (s SqlChannelStore) GetSidebarCategory(userId, teamId, categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
+func (s SqlChannelStore) GetSidebarCategory(categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
 	var categories []*sidebarCategoryForJoin
 	sql, args, _ := s.getQueryBuilder().
 		Select("SidebarCategories.*", "SidebarChannels.ChannelId").

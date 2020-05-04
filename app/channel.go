@@ -2397,8 +2397,8 @@ func (a *App) GetSidebarCategoryOrder(userId, teamId string) ([]string, *model.A
 	return a.Srv().Store.Channel().GetSidebarCategoryOrder(userId, teamId)
 }
 
-func (a *App) GetSidebarCategory(userId, teamId, categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
-	return a.Srv().Store.Channel().GetSidebarCategory(userId, teamId, categoryId)
+func (a *App) GetSidebarCategory(categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
+	return a.Srv().Store.Channel().GetSidebarCategory(categoryId)
 }
 
 func (a *App) CreateSidebarCategory(userId, teamId string, newCategory *model.SidebarCategoryWithChannels) (*model.SidebarCategoryWithChannels, *model.AppError) {

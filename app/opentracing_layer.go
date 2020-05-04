@@ -7473,7 +7473,7 @@ func (a *OpenTracingAppLayer) GetSidebarCategories(userId string, teamId string)
 	return resultVar0, resultVar1
 }
 
-func (a *OpenTracingAppLayer) GetSidebarCategory(userId string, teamId string, categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
+func (a *OpenTracingAppLayer) GetSidebarCategory(categoryId string) (*model.SidebarCategoryWithChannels, *model.AppError) {
 	origCtx := a.ctx
 	span, newCtx := tracing.StartSpanWithParentByContext(a.ctx, "app.GetSidebarCategory")
 
@@ -7485,7 +7485,7 @@ func (a *OpenTracingAppLayer) GetSidebarCategory(userId string, teamId string, c
 	}()
 
 	defer span.Finish()
-	resultVar0, resultVar1 := a.app.GetSidebarCategory(userId, teamId, categoryId)
+	resultVar0, resultVar1 := a.app.GetSidebarCategory(categoryId)
 
 	if resultVar1 != nil {
 		span.LogFields(spanlog.Error(resultVar1))
