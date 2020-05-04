@@ -1985,22 +1985,6 @@ func (s *TimerLayerChannelStore) UpdateSidebarCategoryOrder(userId string, teamI
 	return resultVar0
 }
 
-func (s *TimerLayerChannelStore) UpdateSidebarChannelByPreference(preference *model.Preference) *model.AppError {
-	start := timemodule.Now()
-
-	resultVar0 := s.ChannelStore.UpdateSidebarChannelByPreference(preference)
-
-	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
-	if s.Root.Metrics != nil {
-		success := "false"
-		if resultVar0 == nil {
-			success = "true"
-		}
-		s.Root.Metrics.ObserveStoreMethodDuration("ChannelStore.UpdateSidebarChannelByPreference", success, elapsed)
-	}
-	return resultVar0
-}
-
 func (s *TimerLayerChannelStore) UpdateSidebarChannelCategoryOnMove(channel *model.Channel, newTeamId string) *model.AppError {
 	start := timemodule.Now()
 
@@ -2013,6 +1997,22 @@ func (s *TimerLayerChannelStore) UpdateSidebarChannelCategoryOnMove(channel *mod
 			success = "true"
 		}
 		s.Root.Metrics.ObserveStoreMethodDuration("ChannelStore.UpdateSidebarChannelCategoryOnMove", success, elapsed)
+	}
+	return resultVar0
+}
+
+func (s *TimerLayerChannelStore) UpdateSidebarChannelsByPreferences(preferences *model.Preferences) *model.AppError {
+	start := timemodule.Now()
+
+	resultVar0 := s.ChannelStore.UpdateSidebarChannelsByPreferences(preferences)
+
+	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
+	if s.Root.Metrics != nil {
+		success := "false"
+		if resultVar0 == nil {
+			success = "true"
+		}
+		s.Root.Metrics.ObserveStoreMethodDuration("ChannelStore.UpdateSidebarChannelsByPreferences", success, elapsed)
 	}
 	return resultVar0
 }

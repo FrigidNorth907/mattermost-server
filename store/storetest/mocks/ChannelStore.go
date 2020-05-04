@@ -2078,13 +2078,13 @@ func (_m *ChannelStore) UpdateSidebarCategoryOrder(userId string, teamId string,
 	return r0
 }
 
-// UpdateSidebarChannelByPreference provides a mock function with given fields: preference
-func (_m *ChannelStore) UpdateSidebarChannelByPreference(preference *model.Preference) *model.AppError {
-	ret := _m.Called(preference)
+// UpdateSidebarChannelCategoryOnMove provides a mock function with given fields: channel, newTeamId
+func (_m *ChannelStore) UpdateSidebarChannelCategoryOnMove(channel *model.Channel, newTeamId string) *model.AppError {
+	ret := _m.Called(channel, newTeamId)
 
 	var r0 *model.AppError
-	if rf, ok := ret.Get(0).(func(*model.Preference) *model.AppError); ok {
-		r0 = rf(preference)
+	if rf, ok := ret.Get(0).(func(*model.Channel, string) *model.AppError); ok {
+		r0 = rf(channel, newTeamId)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.AppError)
@@ -2094,13 +2094,13 @@ func (_m *ChannelStore) UpdateSidebarChannelByPreference(preference *model.Prefe
 	return r0
 }
 
-// UpdateSidebarChannelCategoryOnMove provides a mock function with given fields: channel, newTeamId
-func (_m *ChannelStore) UpdateSidebarChannelCategoryOnMove(channel *model.Channel, newTeamId string) *model.AppError {
-	ret := _m.Called(channel, newTeamId)
+// UpdateSidebarChannelsByPreferences provides a mock function with given fields: preferences
+func (_m *ChannelStore) UpdateSidebarChannelsByPreferences(preferences *model.Preferences) *model.AppError {
+	ret := _m.Called(preferences)
 
 	var r0 *model.AppError
-	if rf, ok := ret.Get(0).(func(*model.Channel, string) *model.AppError); ok {
-		r0 = rf(channel, newTeamId)
+	if rf, ok := ret.Get(0).(func(*model.Preferences) *model.AppError); ok {
+		r0 = rf(preferences)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.AppError)

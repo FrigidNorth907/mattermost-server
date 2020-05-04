@@ -2146,24 +2146,6 @@ func (s *OpenTracingLayerChannelStore) UpdateSidebarCategoryOrder(userId string,
 	return resultVar0
 }
 
-func (s *OpenTracingLayerChannelStore) UpdateSidebarChannelByPreference(preference *model.Preference) *model.AppError {
-	origCtx := s.Root.Store.Context()
-	span, newCtx := tracing.StartSpanWithParentByContext(s.Root.Store.Context(), "ChannelStore.UpdateSidebarChannelByPreference")
-	s.Root.Store.SetContext(newCtx)
-	defer func() {
-		s.Root.Store.SetContext(origCtx)
-	}()
-
-	defer span.Finish()
-	resultVar0 := s.ChannelStore.UpdateSidebarChannelByPreference(preference)
-	if resultVar0 != nil {
-		span.LogFields(spanlog.Error(resultVar0))
-		ext.Error.Set(span, true)
-	}
-
-	return resultVar0
-}
-
 func (s *OpenTracingLayerChannelStore) UpdateSidebarChannelCategoryOnMove(channel *model.Channel, newTeamId string) *model.AppError {
 	origCtx := s.Root.Store.Context()
 	span, newCtx := tracing.StartSpanWithParentByContext(s.Root.Store.Context(), "ChannelStore.UpdateSidebarChannelCategoryOnMove")
@@ -2174,6 +2156,24 @@ func (s *OpenTracingLayerChannelStore) UpdateSidebarChannelCategoryOnMove(channe
 
 	defer span.Finish()
 	resultVar0 := s.ChannelStore.UpdateSidebarChannelCategoryOnMove(channel, newTeamId)
+	if resultVar0 != nil {
+		span.LogFields(spanlog.Error(resultVar0))
+		ext.Error.Set(span, true)
+	}
+
+	return resultVar0
+}
+
+func (s *OpenTracingLayerChannelStore) UpdateSidebarChannelsByPreferences(preferences *model.Preferences) *model.AppError {
+	origCtx := s.Root.Store.Context()
+	span, newCtx := tracing.StartSpanWithParentByContext(s.Root.Store.Context(), "ChannelStore.UpdateSidebarChannelsByPreferences")
+	s.Root.Store.SetContext(newCtx)
+	defer func() {
+		s.Root.Store.SetContext(origCtx)
+	}()
+
+	defer span.Finish()
+	resultVar0 := s.ChannelStore.UpdateSidebarChannelsByPreferences(preferences)
 	if resultVar0 != nil {
 		span.LogFields(spanlog.Error(resultVar0))
 		ext.Error.Set(span, true)

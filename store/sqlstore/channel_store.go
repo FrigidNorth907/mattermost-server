@@ -3650,33 +3650,45 @@ func (s SqlChannelStore) UpdateSidebarCategories(userId, teamId string, categori
 }
 
 // UpdateSidebarChannelByPreference is called when the Preference table is being updated to keep SidebarCategories in sync
-func (s SqlChannelStore) UpdateSidebarChannelByPreference(preference *model.Preference) *model.AppError {
-	if preference.Category != model.PREFERENCE_CATEGORY_DIRECT_CHANNEL_SHOW && preference.Category != model.PREFERENCE_CATEGORY_GROUP_CHANNEL_SHOW && preference.Category != model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL {
-		return nil
-	}
-	params := map[string]interface{}{
-		"UserId":       preference.UserId,
-		"ChannelId":    preference.Name,
-		"CategoryType": "",
+func (s SqlChannelStore) UpdateSidebarChannelsByPreferences(preferences *model.Preferences) *model.AppError {
+	transaction, err := s.GetMaster().Begin()
+	if err != nil {
+		return model.NewAppError("SqlChannelStore.UpdateSidebarChannelsByPreferences", "store.sql_channel.sidebar_categories.open_transaction.app_error", nil, err.Error(), http.StatusInternalServerError)
 	}
 
-	switch preference.Category {
-	case model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL:
-		params["CategoryType"] = model.SidebarCategoryFavorites
-	case model.PREFERENCE_CATEGORY_DIRECT_CHANNEL_SHOW:
-	case model.PREFERENCE_CATEGORY_GROUP_CHANNEL_SHOW:
-		params["CategoryType"] = model.SidebarCategoryDirectMessages
+	defer finalizeTransaction(transaction)
+	for _, preference := range *preferences {
+		if preference.Category != model.PREFERENCE_CATEGORY_DIRECT_CHANNEL_SHOW && preference.Category != model.PREFERENCE_CATEGORY_GROUP_CHANNEL_SHOW && preference.Category != model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL {
+			continue
+		}
+		params := map[string]interface{}{
+			"UserId":       preference.UserId,
+			"ChannelId":    preference.Name,
+			"CategoryType": "",
+		}
+
+		switch preference.Category {
+		case model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL:
+			params["CategoryType"] = model.SidebarCategoryFavorites
+		case model.PREFERENCE_CATEGORY_DIRECT_CHANNEL_SHOW:
+		case model.PREFERENCE_CATEGORY_GROUP_CHANNEL_SHOW:
+			params["CategoryType"] = model.SidebarCategoryDirectMessages
+		}
+		// if new preference is false - remove the channel from the appropriate sidebar category
+		if preference.Value == "false" {
+			if _, err := transaction.Exec("DELETE SidebarChannels FROM SidebarChannels LEFT JOIN SidebarCategories ON SidebarCategories.Id = SidebarChannels.CategoryId WHERE SidebarCategories.Type=:CategoryType AND SidebarCategories.UserId=:UserId AND SidebarChannels.UserId=:UserId AND ChannelId=:ChannelId", params); err != nil {
+				return model.NewAppError("SqlChannelStore.UpdateSidebarChannelByPreference", "store.sql_channel.sidebar_categories.app_error", nil, err.Error(), http.StatusInternalServerError)
+			}
+		} else {
+			// otherwise - insert new channel into the apropriate category. ignore duplicate error
+			if _, err := transaction.Exec("INSERT INTO SidebarChannels (ChannelId, UserId, CategoryId, SortOrder) SELECT Id AS CategoryId, :UserId AS UserId, :ChannelId AS ChannelId, MAX(SidebarChannels.SortOrder)+10 FROM SidebarCategories INNER JOIN SidebarChannels ON SidebarChannels.CategoryId = SidebarCategories.Id WHERE SidebarCategories.Type=:CategoryType AND SidebarCategories.UserId=:UserId GROUP BY SidebarChannels.CategoryId, SidebarCategories.Id", params); err != nil && !IsUniqueConstraintError(err, []string{"UserId"}) {
+				return model.NewAppError("SqlChannelStore.UpdateSidebarChannelByPreference", "store.sql_channel.sidebar_categories.app_error", nil, err.Error(), http.StatusInternalServerError)
+			}
+		}
 	}
-	// if new preference is false - remove the channel from the appropriate sidebar category
-	if preference.Value == "false" {
-		if _, err := s.GetMaster().Exec("DELETE SidebarChannels FROM SidebarChannels LEFT JOIN SidebarCategories ON SidebarCategories.Id = SidebarChannels.CategoryId WHERE SidebarCategories.Type=:CategoryType AND SidebarCategories.UserId=:UserId AND SidebarChannels.UserId=:UserId AND ChannelId=:ChannelId", params); err != nil {
-			return model.NewAppError("SqlChannelStore.UpdateSidebarChannelByPreference", "store.sql_channel.sidebar_categories.app_error", nil, err.Error(), http.StatusInternalServerError)
-		}
-	} else {
-		// otherwise - insert new channel into the apropriate category. ignore duplicate error
-		if _, err := s.GetMaster().Exec("INSERT INTO SidebarChannels (ChannelId, UserId, CategoryId, SortOrder) SELECT Id AS CategoryId, :UserId AS UserId, :ChannelId AS ChannelId, MAX(SidebarChannels.SortOrder)+10 FROM SidebarCategories INNER JOIN SidebarChannels ON SidebarChannels.CategoryId = SidebarCategories.Id WHERE SidebarCategories.Type=:CategoryType AND SidebarCategories.UserId=:UserId GROUP BY SidebarChannels.CategoryId, SidebarCategories.Id", params); err != nil && !IsUniqueConstraintError(err, []string{"UserId"}) {
-			return model.NewAppError("SqlChannelStore.UpdateSidebarChannelByPreference", "store.sql_channel.sidebar_categories.app_error", nil, err.Error(), http.StatusInternalServerError)
-		}
+
+	if err := transaction.Commit(); err != nil {
+		return model.NewAppError("SqlChannelStore.UpdateSidebarChannelByPreference", "store.sql_channel.sidebar_categories.commit_transaction.app_error", nil, err.Error(), http.StatusInternalServerError)
 	}
 	return nil
 }
