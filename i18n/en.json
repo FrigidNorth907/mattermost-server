@@ -5791,6 +5791,10 @@
     "translation": "We encountered an error updating the bot."
   },
   {
+    "id": "store.sql_channel.MigrateSidebarCategories.app_error",
+    "translation": "Unable to insert values to database"
+  },
+  {
     "id": "store.sql_channel.MigrateSidebarCategories.commit_transaction.app_error",
     "translation": "Failed to commit the database transaction."
   },
@@ -5999,12 +6003,12 @@
     "translation": "Failed to build query."
   },
   {
-    "id": "store.sql_channel.migrate_memberships.commit_transaction.app_error",
-    "translation": "Failed to commit the database transaction."
+    "id": "store.sql_channel.migrate_memberships.app_error",
+    "translation": "Unable to insert values to database"
   },
   {
-    "id": "store.sql_channel.migrate_memberships.open_transaction.app_error",
-    "translation": "Failed to open the database transaction."
+    "id": "store.sql_channel.migrate_memberships.commit_transaction.app_error",
+    "translation": "Failed to commit the database transaction."
   },
   {
     "id": "store.sql_channel.migrate_memberships.select.app_error",
