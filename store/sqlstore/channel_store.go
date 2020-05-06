@@ -458,6 +458,7 @@ func (s SqlChannelStore) MigrateSidebarCategories(fromTeamId, fromUserId string)
 			Id:          model.NewId(),
 			UserId:      u.UserId,
 			TeamId:      u.TeamId,
+			Sorting:     model.SidebarCategorySortManual,
 			SortOrder:   model.DefaultSidebarSortOrderFavorites,
 			Type:        model.SidebarCategoryFavorites,
 		}); err != nil && !IsUniqueConstraintError(err, []string{"UserId"}) {
@@ -469,6 +470,7 @@ func (s SqlChannelStore) MigrateSidebarCategories(fromTeamId, fromUserId string)
 			Id:          model.NewId(),
 			UserId:      u.UserId,
 			TeamId:      u.TeamId,
+			Sorting:     model.SidebarCategorySortManual,
 			SortOrder:   model.DefaultSidebarSortOrderChannels,
 			Type:        model.SidebarCategoryChannels,
 		}); err != nil && !IsUniqueConstraintError(err, []string{"UserId"}) {
@@ -480,6 +482,7 @@ func (s SqlChannelStore) MigrateSidebarCategories(fromTeamId, fromUserId string)
 			Id:          model.NewId(),
 			UserId:      u.UserId,
 			TeamId:      u.TeamId,
+			Sorting:     model.SidebarCategorySortAlphabetical,
 			SortOrder:   model.DefaultSidebarSortOrderDMs,
 			Type:        model.SidebarCategoryDirectMessages,
 		}); err != nil && !IsUniqueConstraintError(err, []string{"UserId"}) {
@@ -536,6 +539,7 @@ func (s SqlChannelStore) MigrateFavoritesToSidebarChannels(lastUserId string, ru
 		From("Preferences").
 		Where(sq.And{
 			sq.Eq{"Preferences.Category": model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL},
+			sq.NotEq{"Preferences.Value": "false"},
 			sq.NotEq{"SidebarCategories.Id": nil},
 			sq.Gt{"Preferences.UserId": lastUserId},
 		}).
@@ -642,7 +646,7 @@ func (s SqlChannelStore) MigrateDirectGroupMessagesToSidebarChannels(lastChannel
 	}
 	sb := s.
 		getQueryBuilder().
-		Select("Channels.Id AS ChannelId", "ChannelMembers.UserId", "SidebarCategories.Id AS CategoryId", "0 AS SortOrder").
+		Select("Channels.Id AS ChannelId", "ChannelMembers.UserId", "SidebarCategories.Id AS CategoryId").
 		From("Channels").
 		Where(sq.And{
 			sq.Or{
@@ -3443,6 +3447,7 @@ func (s SqlChannelStore) CreateSidebarCategory(userId, teamId string, newCategor
 		Id:          categoryId,
 		UserId:      userId,
 		TeamId:      teamId,
+		Sorting:     model.SidebarCategorySortManual,
 		SortOrder:   maxOrder + model.MinimalSidebarSortDistance,
 		Type:        model.SidebarCategoryCustom,
 	}
@@ -3600,7 +3605,7 @@ func (s SqlChannelStore) UpdateSidebarCategories(userId, teamId string, categori
 
 		category.DisplayName = categoryToUpdate.DisplayName
 		if _, err = transaction.UpdateColumns(func(col *gorp.ColumnMap) bool {
-			return col.ColumnName == "DisplayName"
+			return col.ColumnName == "DisplayName" || col.ColumnName == "Sorting"
 		}, category); err != nil {
 			return nil, model.NewAppError("SqlPostStore.UpdateSidebarCategory", "store.sql_channel.sidebar_categories.app_error", nil, err.Error(), http.StatusInternalServerError)
 		}
@@ -3662,6 +3667,7 @@ func (s SqlChannelStore) UpdateSidebarCategories(userId, teamId string, categori
 }
 
 // UpdateSidebarChannelByPreference is called when the Preference table is being updated to keep SidebarCategories in sync
+// At the moment, it's only handling Favorites and NOT DMs/GMs (those will be handled client side)
 func (s SqlChannelStore) UpdateSidebarChannelsByPreferences(preferences *model.Preferences) *model.AppError {
 	transaction, err := s.GetMaster().Begin()
 	if err != nil {
@@ -3670,21 +3676,13 @@ func (s SqlChannelStore) UpdateSidebarChannelsByPreferences(preferences *model.P
 
 	defer finalizeTransaction(transaction)
 	for _, preference := range *preferences {
-		if preference.Category != model.PREFERENCE_CATEGORY_DIRECT_CHANNEL_SHOW && preference.Category != model.PREFERENCE_CATEGORY_GROUP_CHANNEL_SHOW && preference.Category != model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL {
+		if preference.Category != model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL {
 			continue
 		}
 		params := map[string]interface{}{
 			"UserId":       preference.UserId,
 			"ChannelId":    preference.Name,
-			"CategoryType": "",
-		}
-
-		switch preference.Category {
-		case model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL:
-			params["CategoryType"] = model.SidebarCategoryFavorites
-		case model.PREFERENCE_CATEGORY_DIRECT_CHANNEL_SHOW:
-		case model.PREFERENCE_CATEGORY_GROUP_CHANNEL_SHOW:
-			params["CategoryType"] = model.SidebarCategoryDirectMessages
+			"CategoryType": model.SidebarCategoryFavorites,
 		}
 		// if new preference is false - remove the channel from the appropriate sidebar category
 		if preference.Value == "false" {

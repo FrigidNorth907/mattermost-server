@@ -9,6 +9,7 @@ import (
 )
 
 type SidebarCategoryType string
+type SidebarCategorySorting string
 
 const (
 	// Each sidebar category has a 'type'. System categories are Channels, Favorites and DMs
@@ -23,17 +24,25 @@ const (
 	DefaultSidebarSortOrderFavorites = 0
 	DefaultSidebarSortOrderChannels  = DefaultSidebarSortOrderFavorites + MinimalSidebarSortDistance
 	DefaultSidebarSortOrderDMs       = DefaultSidebarSortOrderChannels + MinimalSidebarSortDistance
+	// Sorting modes
+	// default for all categories except DMs
+	SidebarCategorySortManual SidebarCategorySorting = ""
+	// sort by recency
+	SidebarCategorySortRecent SidebarCategorySorting = "recent"
+	// sort by display name alphabetically
+	SidebarCategorySortAlphabetical SidebarCategorySorting = "alpha"
 )
 
 // SidebarCategory represents the corresponding DB table
 // SortOrder is never returned to the user and only used for queries
 type SidebarCategory struct {
-	Id          string              `json:"id"`
-	UserId      string              `json:"user_id"`
-	TeamId      string              `json:"team_id"`
-	SortOrder   int64               `json:"-"`
-	Type        SidebarCategoryType `json:"type"`
-	DisplayName string              `json:"display_name"`
+	Id          string                 `json:"id"`
+	UserId      string                 `json:"user_id"`
+	TeamId      string                 `json:"team_id"`
+	SortOrder   int64                  `json:"-"`
+	Sorting     SidebarCategorySorting `json:"sorting"`
+	Type        SidebarCategoryType    `json:"type"`
+	DisplayName string                 `json:"display_name"`
 }
 
 // SidebarCategoryWithChannels combines data from SidebarCategory table with the Channel IDs that belong to that category

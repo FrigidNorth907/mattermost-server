@@ -80,7 +80,7 @@ func (worker *Worker) runSidebarCategoriesPhase2Migration(lastDone string) (bool
 	} else {
 		progress = ProgressFromJson(strings.NewReader(lastDone))
 		if !progress.IsValid() {
-			return false, "", model.NewAppError("MigrationsWorker.runSidebarCategoriesPhase1Migration", "migrations.worker.run_sidebar_categories_phase_1_migration.invalid_progress", map[string]interface{}{"progress": progress.ToJson()}, "", http.StatusInternalServerError)
+			return false, "", model.NewAppError("MigrationsWorker.runSidebarCategoriesPhase2Migration", "migrations.worker.run_sidebar_categories_phase_2_migration.invalid_progress", map[string]interface{}{"progress": progress.ToJson()}, "", http.StatusInternalServerError)
 		}
 	}
 
@@ -100,6 +100,8 @@ func (worker *Worker) runSidebarCategoriesPhase2Migration(lastDone string) (bool
 	case StepFavorites:
 		result, err = worker.app.Srv().Store.Channel().MigrateFavoritesToSidebarChannels(progress.LastUserId, progress.LastSortOrder)
 		nextStep = StepEnd
+	default:
+		return false, "", model.NewAppError("MigrationsWorker.runSidebarCategoriesPhase2Migration", "migrations.worker.run_sidebar_categories_phase_2_migration.invalid_progress", map[string]interface{}{"progress": progress.ToJson()}, "", http.StatusInternalServerError)
 	}
 
 	if err != nil {
