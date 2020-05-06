@@ -4403,7 +4403,7 @@
     "translation": "Unable to run migration job due to unknown migration key."
   },
   {
-    "id": "migrations.worker.run_sidebar_categories_phase_1_migration.invalid_progress",
+    "id": "migrations.worker.run_sidebar_categories_phase_2_migration.invalid_progress",
     "translation": "Migration failed due to invalid progress data."
   },
   {
