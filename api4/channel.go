@@ -1796,8 +1796,8 @@ func createCategoryForTeamForUser(c *Context, w http.ResponseWriter, r *http.Req
 
 	auditRec := c.MakeAuditRecord("createCategoryForTeamForUser", audit.Fail)
 	defer c.LogAuditRec(auditRec)
+	
 	categoryCreateRequest, err := model.SidebarCategoryFromJson(r.Body)
-
 	if err != nil || c.Params.UserId != categoryCreateRequest.UserId || c.Params.TeamId != categoryCreateRequest.TeamId {
 		c.SetInvalidParam("category")
 		return

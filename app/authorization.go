@@ -85,7 +85,6 @@ func (a *App) SessionHasPermissionToCategory(session model.Session, userId, team
 		return true
 	}
 	category, err := a.GetSidebarCategory(categoryId)
-
 	return err == nil && category != nil && category.UserId == session.UserId && category.UserId == userId && category.TeamId == teamId
 }
 

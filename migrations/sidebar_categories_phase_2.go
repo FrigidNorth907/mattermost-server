@@ -56,11 +56,10 @@ func (p *Progress) IsValid() bool {
 
 	switch p.CurrentStep {
 	case StepCategories, StepChannels, StepDMs, StepFavorites:
+		return true
 	default:
 		return false
 	}
-
-	return true
 }
 
 func newProgress(step ProgressStep) *Progress {

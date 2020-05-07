@@ -5014,7 +5014,7 @@ func (c *Client4) GetSidebarCategoriesForTeamForUser(userID, teamID, etag string
 	defer closeBody(r)
 	cat, err := OrderedSidebarCategoriesFromJson(r.Body)
 	if err != nil {
-		return nil, &Response{StatusCode: http.StatusBadRequest, Error: NewAppError(c.GetUserRoute(userID), "model.client.connecting.app_error", nil, err.Error(), http.StatusForbidden)}
+		return nil,BuildErrorResponse(r, NewAppError("Client4.GetSidebarCategoriesForTeamForUser", "model.utils.decode_json.app_error", nil, err.Error(), r.StatusCode))
 	}
 	return cat, BuildResponse(r)
 }
@@ -5029,7 +5029,7 @@ func (c *Client4) CreateSidebarCategoryForTeamForUser(userID, teamID string, cat
 	defer closeBody(r)
 	cat, err := SidebarCategoryFromJson(r.Body)
 	if err != nil {
-		return nil, &Response{StatusCode: http.StatusBadRequest, Error: NewAppError(c.GetUserRoute(userID), "model.client.connecting.app_error", nil, err.Error(), http.StatusForbidden)}
+		return nil,BuildErrorResponse(r, NewAppError("Client4.CreateSidebarCategoryForTeamForUser", "model.utils.decode_json.app_error", nil, err.Error(), r.StatusCode))
 	}
 	return cat, BuildResponse(r)
 }
