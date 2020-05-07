@@ -27,7 +27,7 @@ const (
 	// Sorting modes
 	// default for all categories except DMs
 	SidebarCategorySortManual SidebarCategorySorting = ""
-	// sort by recency
+	// sort by recency (default for DMs)
 	SidebarCategorySortRecent SidebarCategorySorting = "recent"
 	// sort by display name alphabetically
 	SidebarCategorySortAlphabetical SidebarCategorySorting = "alpha"

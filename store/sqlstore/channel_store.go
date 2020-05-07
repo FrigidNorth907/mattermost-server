@@ -482,7 +482,7 @@ func (s SqlChannelStore) MigrateSidebarCategories(fromTeamId, fromUserId string)
 			Id:          model.NewId(),
 			UserId:      u.UserId,
 			TeamId:      u.TeamId,
-			Sorting:     model.SidebarCategorySortAlphabetical,
+			Sorting:     model.SidebarCategorySortRecent,
 			SortOrder:   model.DefaultSidebarSortOrderDMs,
 			Type:        model.SidebarCategoryDirectMessages,
 		}); err != nil && !IsUniqueConstraintError(err, []string{"UserId"}) {

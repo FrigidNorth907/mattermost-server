@@ -6520,6 +6520,12 @@ func testSidebarChannelsMigration(t *testing.T, ss store.Store) {
 		GroupConstrained: model.NewBool(true),
 	}, 10)
 	require.Nil(t, err)
+	defer func() {
+		ss.Channel().PermanentDeleteMembersByChannel(channel1.Id)
+		ss.Channel().PermanentDeleteByTeam(teamId)
+		ss.Channel().PermanentDelete(channel1.Id)
+	}()
+
 	u1 := &model.User{}
 	u1.Email = MakeEmail()
 	u1.Nickname = model.NewId()
