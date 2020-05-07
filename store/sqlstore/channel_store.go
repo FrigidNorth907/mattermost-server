@@ -3470,7 +3470,7 @@ func (s SqlChannelStore) CreateSidebarCategory(userId, teamId string, newCategor
 	}
 
 	if err = transaction.Commit(); err != nil {
-		return nil, model.NewAppError("SqlChannelStore.UpdateSidebarCategory", "store.sql_channel.sidebar_categories.commit_transaction.app_error", nil, err.Error(), http.StatusInternalServerError)
+		return nil, model.NewAppError("SqlChannelStore.CreateSidebarCategory", "store.sql_channel.sidebar_categories.commit_transaction.app_error", nil, err.Error(), http.StatusInternalServerError)
 	}
 
 	return &model.SidebarCategoryWithChannels{
