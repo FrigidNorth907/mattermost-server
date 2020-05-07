@@ -119,9 +119,11 @@ func (worker *Worker) runSidebarCategoriesPhase2Migration(lastDone string) (bool
 	progress.LastTeamId = result["TeamId"].(string)
 	progress.LastUserId = result["UserId"].(string)
 	progress.LastChannelId = strings.Repeat("0", 26)
-	if result["ChannelId"] != nil {
-		progress.LastChannelId = result["ChannelId"].(string)
+	if val, ok := result["ChannelId"].(string); ok {
+		progress.LastChannelId = val
 	}
-	progress.LastSortOrder = result["SortOrder"].(int64)
+	if val, ok := result["ChannelId"].(int64); ok {
+		progress.LastSortOrder = val
+	}
 	return false, progress.ToJson(), nil
 }
