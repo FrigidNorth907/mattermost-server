@@ -3619,10 +3619,12 @@ func (s SqlChannelStore) UpdateSidebarCategories(userId, teamId string, categori
 
 		if category.Type == model.SidebarCategoryFavorites {
 			// clean previous preference favorites (to support bi-directional sync)
-			sql, args, _ = s.getQueryBuilder().Delete("Preferences").Where(sq.And{
-				sq.Eq{"ChannelId": categoryToUpdate.Channels},
-				sq.Eq{"Preferences.Category": model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL},
-			}).ToSql()
+			sql, args, _ = s.getQueryBuilder().Delete("Preferences").Where(
+				sq.Eq{
+					"ChannelId":            categoryToUpdate.Channels,
+					"Preferences.Category": model.PREFERENCE_CATEGORY_FAVORITE_CHANNEL,
+				},
+			).ToSql()
 
 			if _, err = transaction.Exec(sql, args...); err != nil {
 				return nil, model.NewAppError("SqlPostStore.UpdateSidebarCategory", "store.sql_channel.sidebar_categories.app_error", nil, err.Error(), http.StatusInternalServerError)
