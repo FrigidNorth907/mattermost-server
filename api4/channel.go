@@ -1796,7 +1796,7 @@ func createCategoryForTeamForUser(c *Context, w http.ResponseWriter, r *http.Req
 
 	auditRec := c.MakeAuditRecord("createCategoryForTeamForUser", audit.Fail)
 	defer c.LogAuditRec(auditRec)
-	
+
 	categoryCreateRequest, err := model.SidebarCategoryFromJson(r.Body)
 	if err != nil || c.Params.UserId != categoryCreateRequest.UserId || c.Params.TeamId != categoryCreateRequest.TeamId {
 		c.SetInvalidParam("category")
@@ -1934,7 +1934,7 @@ func updateCategoriesForTeamForUser(c *Context, w http.ResponseWriter, r *http.R
 func validateUserChannels(operationName string, c *Context, teamId, userId string, channelIDs []string) *model.AppError {
 	channels, err := c.App.GetChannelsForUser(teamId, userId, false)
 	if err != nil {
-		return model.NewAppError("Api4."+operationName, "api.invalid_channel", nil, err.Error(), http.StatusInternalServerError)
+		return model.NewAppError("Api4."+operationName, "api.invalid_channel", nil, err.Error(), http.StatusBadRequest)
 	}
 	for _, channelId := range channelIDs {
 		found := false
@@ -1944,7 +1944,7 @@ func validateUserChannels(operationName string, c *Context, teamId, userId strin
 				break
 			}
 			if !found {
-				return model.NewAppError("Api4."+operationName, "api.invalid_channel", nil, err.Error(), http.StatusInternalServerError)
+				return model.NewAppError("Api4."+operationName, "api.invalid_channel", nil, err.Error(), http.StatusBadRequest)
 			}
 		}
 	}
