@@ -266,7 +266,7 @@ ifeq ($(BUILD_ENTERPRISE_READY),true)
 		$(GO) test $(GOFLAGS) -race -run=$(TESTS) -c $$package; \
 		if [ -f $$(basename $$package).test ]; then \
 			echo "Testing "$$package; \
-			./$$(basename $$package).test -test.timeout=2000s || exit 1; \
+			./$$(basename $$package).test -test.timeout=4000s || exit 1; \
 			rm -r $$(basename $$package).test; \
 		fi; \
 	done
