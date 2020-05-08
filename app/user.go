@@ -366,20 +366,26 @@ func (a *App) CreateOAuthUser(service string, userData io.Reader, teamId string)
 	return ruser, nil
 }
 
-// CheckEmailDomain checks that an email domain matches a list of space-delimited domains as a string.
+//CheckEmailDomain verifies that the inputted email is in the whitelist
 func CheckEmailDomain(email string, domains string) bool {
-	if len(domains) == 0 {
-		return true
-	}
-
-	domainArray := strings.Fields(strings.TrimSpace(strings.ToLower(strings.Replace(strings.Replace(domains, "@", " ", -1), ",", " ", -1))))
-
-	for _, d := range domainArray {
-		if strings.HasSuffix(strings.ToLower(email), "@"+d) {
+	reEmailFormat := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	reWildCardFormat := regexp.MustCompile(`\A\*\.[a-zA-Z0-9]`)
+	if reEmailFormat.MatchString(email) {
+		if len(domains) == 0 {
 			return true
 		}
+		domainArray := strings.Fields(strings.TrimSpace(strings.ToLower(strings.Replace(strings.Replace(domains, "@", " ", -1), ",", " ", -1))))
+		for _, d := range domainArray {
+			if reWildCardFormat.MatchString(d) {
+				if strings.HasSuffix(strings.ToLower(email), strings.Replace(d, "*", "", -1)) {
+					return true
+				}
+			}
+			if strings.HasSuffix(strings.ToLower(email), "@"+d) {
+				return true
+			}
+		}
 	}
-
 	return false
 }
 
